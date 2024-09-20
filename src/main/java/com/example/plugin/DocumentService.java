@@ -15,13 +15,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class DocumentService {
     public int countWordsTXT(InputStream stream){
-        Scanner s = new Scanner(stream);
-        int count = 0;
-        while(s.hasNext()){
-            s.next();
-            count++;
+        int count;
+        try (Scanner s = new Scanner(stream)) {
+            count = 0;
+            while(s.hasNext()){
+                s.next();
+                count++;
+            }
         }
-        s.close();
         return count;
     }
     public long countWordsDocx(InputStream stream) throws Exception {
@@ -32,10 +33,11 @@ public class DocumentService {
         return Arrays.stream(text.split("\\s+")).count();
     }
     public int countWordsPdf(InputStream stream) throws Exception{
-        PDDocument pdf = PDDocument.load(stream);
-        PDFTextStripper pdfStripper = new PDFTextStripper();
-        String text = pdfStripper.getText(pdf);
-        pdf.close();
+        String text;
+        try (PDDocument pdf = PDDocument.load(stream)) {
+            PDFTextStripper pdfStripper = new PDFTextStripper();
+            text = pdfStripper.getText(pdf);
+        }
         return text.split("\\s+").length;
     }
 
